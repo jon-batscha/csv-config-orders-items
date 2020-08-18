@@ -1,4 +1,4 @@
-# config-driven-csv-ingestion
+# csv-config-orders-items
 
 This package is a clone of the [config-driven-csv package](https://github.com/jon-batscha/config-csv-ingestion), with one important distinction:
 
