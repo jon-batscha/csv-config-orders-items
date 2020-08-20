@@ -20,7 +20,7 @@ def send_event_payload(payload):
     action: sends a complete event payload to metrics api
     '''
 
-    set_event_id(payload)
+    # set_event_id(payload)
     set_timestamp(payload)
 
     endpoint = 'https://a.klaviyo.com/api/track'
@@ -86,7 +86,7 @@ def set_timestamp(payload):
     if 'time' not in payload.keys():
         payload['time'] = '' #int(time.time())
     elif type(payload['time']) == str:
-        if payload['time'].isnumeric():
+        if is_number(payload['time']):
             payload['time'] = int(payload['time'])
         else:
             payload['time'] = int(datetime.datetime.fromisoformat(payload['time']).timestamp())
@@ -94,24 +94,24 @@ def set_timestamp(payload):
     return None
 
 
-def set_event_id(payload):
-    '''
-    input: payload for event
-    ouput: None
-    action: sets $event_id according to logic laid out in docs
-    '''
+# def set_event_id(payload):
+#     '''
+#     input: payload for event
+#     ouput: None
+#     action: sets $event_id according to logic laid out in docs
+#     '''
 
-    if '$event_id' not in payload['properties'].keys():
+#     if '$event_id' not in payload['properties'].keys():
 
-        payload['properties']['$event_id'] = str(abs(hash(str(payload))))
+#         payload['properties']['$event_id'] = str(abs(hash(str(payload))))
 
-    elif not payload['properties']['$event_id'] or payload['properties']['$event_id'] == '':
-        
-            del payload['properties']['$event_id']
+#     if not payload['properties']['$event_id'] or payload['properties']['$event_id'] == '':
 
-            payload['properties']['$event_id'] = str(abs(hash(str(payload))))
+#             del payload['properties']['$event_id']
 
-    return None
+#             payload['properties']['$event_id'] = str(abs(hash(str(payload))))
+
+#     return None
 
 
 def csv_to_payloads(public_key, mapping, filepath):
@@ -151,7 +151,7 @@ def csv_to_payloads(public_key, mapping, filepath):
 
                 continue
 
-            elif type(obj[key]) == str:
+            elif type(obj[key]) == str and obj[key] != '':
 
                 value = row[name_to_col[obj[key]]]
 
@@ -168,10 +168,12 @@ def csv_to_payloads(public_key, mapping, filepath):
                 subkeys = list(obj[key].keys())
 
                 for subkey in subkeys:
-                    
-                    value = row[name_to_col[obj[key][subkey]]]
 
-                    if value != '':
+                    header = obj[key][subkey]
+
+                    if header != '' and type(header) == str:
+
+                        value = row[name_to_col[obj[key][subkey]]]
 
                         obj[key][subkey] = value
 
@@ -266,7 +268,7 @@ def csv_to_orders(public_key, mapping, filepath, ordered_items_list):
 
             value = row[name_to_col[mapping['summed_properties'][key]]]
 
-            if value.isnumeric():
+            if is_number(value):
 
                 if order['summed_properties'][key] == 0:
                     order['summed_properties'][key] = eval(value)
@@ -316,7 +318,7 @@ def csv_to_orders(public_key, mapping, filepath, ordered_items_list):
     return payloads
 
 
-# Threading
+# other
 def parallelize(function,args):
     '''
     input: function, list of args
@@ -332,10 +334,9 @@ def parallelize(function,args):
     return outputs
 
 
-
-
-
-
-
-
-
+def is_number(string):
+    try:
+        float(string)
+        return True
+    except ValueError:
+        return False
