@@ -1,8 +1,7 @@
 from utils import *
 import config
 
-# filename = sys.argv[1]
-filename = 'complete_ordered_items.csv'
+filename = sys.argv[1]
 
 # generate list of payloads from csv
 items = csv_to_payloads(config.public_key, config.item_mapping, filename)
