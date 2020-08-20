@@ -106,6 +106,8 @@ def set_event_id(payload):
         payload['properties']['$event_id'] = str(abs(hash(str(payload))))
 
     elif not payload['properties']['$event_id'] or payload['properties']['$event_id'] == '':
+        
+            del payload['properties']['$event_id']
 
             payload['properties']['$event_id'] = str(abs(hash(str(payload))))
 
