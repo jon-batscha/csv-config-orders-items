@@ -20,7 +20,10 @@ def send_event_payload(payload):
     action: sends a complete event payload to metrics api
     '''
 
-    # set_event_id(payload)
+    if not is_valid_event(payload):
+
+        return payload
+        
     set_timestamp(payload)
 
     endpoint = 'https://a.klaviyo.com/api/track'
@@ -94,24 +97,49 @@ def set_timestamp(payload):
     return None
 
 
-# def set_event_id(payload):
+# def verify_event_id(payload):
 #     '''
 #     input: payload for event
 #     ouput: None
 #     action: sets $event_id according to logic laid out in docs
 #     '''
 
-#     if '$event_id' not in payload['properties'].keys():
+#     if '$event_id' in payload['properties'].keys():
 
-#         payload['properties']['$event_id'] = str(abs(hash(str(payload))))
+#         if not payload['properties']['$event_id'] or payload['properties']['$event_id'] == '':
 
-#     if not payload['properties']['$event_id'] or payload['properties']['$event_id'] == '':
+#                 del payload['properties']['$event_id']
 
-#             del payload['properties']['$event_id']
 
-#             payload['properties']['$event_id'] = str(abs(hash(str(payload))))
+
+#         else:
+
+#             print(payload)
 
 #     return None
+
+def is_valid_event(payload):
+
+    # valid time
+    if 'time' not in payload.keys():
+
+        return False
+
+    elif not payload['time'] or payload['time'] == '':
+
+        return False
+
+    # valid event_id
+    if '$event_id' not in payload['properties'].keys():
+
+        return False
+
+    elif not payload['properties']['$event_id'] or payload['properties']['$event_id'] == '':
+
+        return False
+
+    # if pass all negativity tests
+    return True
 
 
 def csv_to_payloads(public_key, mapping, filepath):
